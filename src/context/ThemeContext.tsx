@@ -2,24 +2,22 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
-type Theme = 'positive' | 'negative'
+export type Theme = 'positive' | 'negative'
 
 const ThemeContext = createContext<{
   theme: Theme
-  toggle: () => void
-}>({ theme: 'positive', toggle: () => {} })
+  setTheme: (t: Theme) => void
+}>({ theme: 'positive', setTheme: () => {} })
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('positive')
+  const [theme, setThemeState] = useState<Theme>('positive')
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
   }, [theme])
 
-  const toggle = () => setTheme((t) => (t === 'positive' ? 'negative' : 'positive'))
-
   return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
+    <ThemeContext.Provider value={{ theme, setTheme: setThemeState }}>
       {children}
     </ThemeContext.Provider>
   )
