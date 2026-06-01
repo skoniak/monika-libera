@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef, useState, useCallback } from 'react'
+import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useTheme, type Theme } from '@/context/ThemeContext'
+import { useTheme } from '@/context/ThemeContext'
 
 const NAV = {
   pl: [
@@ -22,79 +22,9 @@ export default function Header() {
   const { lang, toggle: toggleLang } = useLanguage()
   const { theme, setTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
-  const isAnimating = useRef(false)
 
-  // CRT off/on transition effect
-  const triggerCRT = useCallback(() => {
-    if (isAnimating.current) return
-    isAnimating.current = true
-
-    const next: Theme = theme === 'positive' ? 'negative' : 'positive'
-    const currentBg = theme === 'positive' ? '#ffffff' : '#000000'
-    const nextBg = next === 'positive' ? '#ffffff' : '#000000'
-
-    const veil = document.createElement('div')
-    veil.style.cssText = [
-      'position:fixed',
-      'inset:0',
-      `background:${currentBg}`,
-      'transform-origin:center center',
-      'transition:transform 220ms ease-in',
-      'z-index:9998',
-      'pointer-events:none',
-    ].join(';')
-    document.body.appendChild(veil)
-
-    // Double rAF: ensures repaint before transition starts
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        veil.style.transform = 'scaleY(0.005)'
-      })
-    })
-
-    // Fallback: cleanup if transitionend never fires
-    const fallback = setTimeout(() => {
-      setTheme(next)
-      veil.remove()
-      isAnimating.current = false
-    }, 700)
-
-    veil.addEventListener(
-      'transitionend',
-      () => {
-        clearTimeout(fallback)
-
-        // Brief pause at the scan line, then switch + expand
-        setTimeout(() => {
-          setTheme(next)
-          veil.style.background = nextBg
-          veil.style.transition = 'transform 280ms ease-out'
-
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              veil.style.transform = 'scaleY(1)'
-            })
-          })
-
-          const fallback2 = setTimeout(() => {
-            veil.remove()
-            isAnimating.current = false
-          }, 400)
-
-          veil.addEventListener(
-            'transitionend',
-            () => {
-              clearTimeout(fallback2)
-              veil.remove()
-              isAnimating.current = false
-            },
-            { once: true },
-          )
-        }, 60)
-      },
-      { once: true },
-    )
-  }, [theme, setTheme])
+  const toggleTheme = () =>
+    setTheme(theme === 'positive' ? 'negative' : 'positive')
 
   const links = NAV[lang]
 
@@ -122,7 +52,7 @@ export default function Header() {
 
   const themeBtn = (
     <button
-      onClick={triggerCRT}
+      onClick={toggleTheme}
       className="theme-badge uppercase"
       aria-label={theme === 'positive' ? 'Przełącz na negatyw' : 'Przełącz na pozytyw'}
     >

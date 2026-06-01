@@ -36,7 +36,9 @@ body {
   min-height: 100%;
   background-color: var(--bg);
   color: var(--text);
-  /* No transition here — the CRT animation covers instant bg swap */
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
   font-family: var(--font-sans), system-ui, sans-serif;
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
