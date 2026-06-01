@@ -10,6 +10,7 @@ export const config = defineConfig({
   projectId,
   dataset,
   title: 'Monika Libera',
+  basePath: '/studio',
   apiVersion,
   plugins: [
     structureTool({
