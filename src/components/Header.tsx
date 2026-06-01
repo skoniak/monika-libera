@@ -18,65 +18,83 @@ const NAV = {
   ],
 }
 
-const DURATION = 750 // ms — must match CSS transition
-
 export default function Header() {
   const { lang, toggle: toggleLang } = useLanguage()
   const { theme, setTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [rotating, setRotating] = useState(false)
   const isAnimating = useRef(false)
 
-  // icon angle: encodes current mode + in-progress transition
-  // positive+idle→0°  positive+rotating→180°
-  // negative+idle→180° negative+rotating→0°
-  const iconDeg = theme === 'negative' ? (rotating ? 0 : 180) : (rotating ? 180 : 0)
+  // CRT off/on transition effect
+  const triggerCRT = useCallback(() => {
+    if (isAnimating.current) return
+    isAnimating.current = true
 
-  const triggerRipple = useCallback(
-    (e: React.MouseEvent) => {
-      if (isAnimating.current) return
-      isAnimating.current = true
-      setRotating(true)
+    const next: Theme = theme === 'positive' ? 'negative' : 'positive'
+    const currentBg = theme === 'positive' ? '#ffffff' : '#000000'
+    const nextBg = next === 'positive' ? '#ffffff' : '#000000'
 
-      const next: Theme = theme === 'positive' ? 'negative' : 'positive'
-      const nextBg = next === 'negative' ? '#000000' : '#ffffff'
-      const x = e.clientX
-      const y = e.clientY
+    const veil = document.createElement('div')
+    veil.style.cssText = [
+      'position:fixed',
+      'inset:0',
+      `background:${currentBg}`,
+      'transform-origin:center center',
+      'transition:transform 220ms ease-in',
+      'z-index:9998',
+      'pointer-events:none',
+    ].join(';')
+    document.body.appendChild(veil)
 
-      const veil = document.createElement('div')
-      veil.style.cssText = [
-        'position:fixed',
-        'inset:0',
-        `background:${nextBg}`,
-        `clip-path:circle(0px at ${x}px ${y}px)`,
-        `transition:clip-path ${DURATION}ms cubic-bezier(0.4,0,0.2,1)`,
-        'z-index:9998',
-        'pointer-events:none',
-        'will-change:clip-path',
-      ].join(';')
-
-      document.body.appendChild(veil)
-
-      // Double rAF ensures transition fires after paint
+    // Double rAF: ensures repaint before transition starts
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          veil.style.clipPath = `circle(200vmax at ${x}px ${y}px)`
-        })
+        veil.style.transform = 'scaleY(0.005)'
       })
+    })
 
-      veil.addEventListener(
-        'transitionend',
-        () => {
+    // Fallback: cleanup if transitionend never fires
+    const fallback = setTimeout(() => {
+      setTheme(next)
+      veil.remove()
+      isAnimating.current = false
+    }, 700)
+
+    veil.addEventListener(
+      'transitionend',
+      () => {
+        clearTimeout(fallback)
+
+        // Brief pause at the scan line, then switch + expand
+        setTimeout(() => {
           setTheme(next)
-          setRotating(false)
-          veil.remove()
-          isAnimating.current = false
-        },
-        { once: true },
-      )
-    },
-    [theme, setTheme],
-  )
+          veil.style.background = nextBg
+          veil.style.transition = 'transform 280ms ease-out'
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              veil.style.transform = 'scaleY(1)'
+            })
+          })
+
+          const fallback2 = setTimeout(() => {
+            veil.remove()
+            isAnimating.current = false
+          }, 400)
+
+          veil.addEventListener(
+            'transitionend',
+            () => {
+              clearTimeout(fallback2)
+              veil.remove()
+              isAnimating.current = false
+            },
+            { once: true },
+          )
+        }, 60)
+      },
+      { once: true },
+    )
+  }, [theme, setTheme])
 
   const links = NAV[lang]
 
@@ -85,7 +103,7 @@ export default function Header() {
       key={href}
       href={href}
       onClick={() => setMenuOpen(false)}
-      className="font-sans text-xs uppercase tracking-widest transition-opacity duration-200 opacity-55 hover:opacity-100"
+      className="font-sans text-xs uppercase tracking-widest transition-opacity duration-200 opacity-50 hover:opacity-100"
       style={{ color: 'var(--text)' }}
     >
       {label}
@@ -95,7 +113,7 @@ export default function Header() {
   const langBtn = (
     <button
       onClick={toggleLang}
-      className="font-sans text-xs uppercase tracking-widest transition-opacity duration-200 opacity-55 hover:opacity-100"
+      className="font-sans text-xs uppercase tracking-widest transition-opacity duration-200 opacity-50 hover:opacity-100"
       style={{ color: 'var(--text)' }}
     >
       {lang === 'pl' ? 'EN' : 'PL'}
@@ -104,66 +122,58 @@ export default function Header() {
 
   const themeBtn = (
     <button
-      onClick={triggerRipple}
+      onClick={triggerCRT}
+      className="theme-badge uppercase"
       aria-label={theme === 'positive' ? 'Przełącz na negatyw' : 'Przełącz na pozytyw'}
-      className="leading-none transition-opacity duration-200 opacity-70 hover:opacity-100"
-      style={{ color: 'var(--text)', fontSize: '1.25rem' }}
     >
-      <span
-        aria-hidden
-        style={{
-          display: 'inline-block',
-          transform: `rotate(${iconDeg}deg)`,
-          transition: `transform ${DURATION}ms cubic-bezier(0.4,0,0.2,1)`,
-        }}
-      >
-        ◐
-      </span>
+      B/W
     </button>
   )
 
   return (
     <>
-      <header
-        className="w-full px-6 md:px-10 py-5 flex items-center justify-between"
-        style={{ borderBottom: '1px solid var(--border)', color: 'var(--text)' }}
-      >
-        {/* ── Name ──────────────────────────────────────────── */}
-        <Link
-          href="/"
-          className="font-serif uppercase tracking-[0.18em] shrink-0 transition-opacity duration-200 hover:opacity-70"
-          style={{ color: 'var(--text)', fontSize: 'clamp(1rem, 2vw, 1.35rem)' }}
-        >
-          Monika Libera
-        </Link>
+      <header style={{ borderBottom: '1px solid var(--border)', color: 'var(--text)' }}>
+        <div className="content-container flex items-center justify-between py-5">
+          {/* ── Name ──────────────────────────────────────── */}
+          <Link
+            href="/"
+            className="font-serif uppercase tracking-[0.18em] shrink-0 transition-opacity duration-200 hover:opacity-60"
+            style={{ color: 'var(--text)', fontSize: 'clamp(0.95rem, 2vw, 1.3rem)' }}
+          >
+            Monika Libera
+          </Link>
 
-        {/* ── Desktop: nav + controls ────────────────────────── */}
-        <nav className="hidden md:flex items-center gap-7">
-          {links.map(({ href, label }) => navLink(href, label))}
-          <span className="opacity-20" style={{ borderLeft: '1px solid var(--text)', height: '0.9rem' }} />
-          {langBtn}
-          {themeBtn}
-        </nav>
+          {/* ── Desktop nav + controls ────────────────────── */}
+          <nav className="hidden md:flex items-center gap-7">
+            {links.map(({ href, label }) => navLink(href, label))}
+            <span
+              className="opacity-20"
+              style={{ borderLeft: '1px solid var(--text)', height: '0.85rem' }}
+            />
+            {langBtn}
+            {themeBtn}
+          </nav>
 
-        {/* ── Mobile: hamburger ──────────────────────────────── */}
-        <button
-          className="md:hidden text-lg leading-none p-1 opacity-70 hover:opacity-100 transition-opacity"
-          style={{ color: 'var(--text)' }}
-          onClick={() => setMenuOpen((o) => !o)}
-          aria-label={menuOpen ? 'Zamknij menu' : 'Otwórz menu'}
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
+          {/* ── Mobile hamburger ──────────────────────────── */}
+          <button
+            className="md:hidden text-base leading-none p-1 opacity-60 hover:opacity-100 transition-opacity"
+            style={{ color: 'var(--text)' }}
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? 'Zamknij menu' : 'Otwórz menu'}
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
+        </div>
       </header>
 
-      {/* ── Mobile overlay menu ───────────────────────────────── */}
+      {/* ── Mobile overlay menu ───────────────────────────── */}
       {menuOpen && (
         <div
           className="md:hidden fixed inset-0 z-50 flex flex-col items-center justify-center gap-9"
           style={{ background: 'var(--bg)', color: 'var(--text)' }}
         >
           <button
-            className="absolute top-5 right-6 text-lg opacity-60 hover:opacity-100 transition-opacity"
+            className="absolute top-5 right-6 text-base opacity-50 hover:opacity-100 transition-opacity"
             style={{ color: 'var(--text)' }}
             onClick={() => setMenuOpen(false)}
             aria-label="Zamknij menu"
@@ -176,7 +186,7 @@ export default function Header() {
               key={href}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="font-sans text-sm uppercase tracking-widest opacity-70 hover:opacity-100 transition-opacity"
+              className="font-sans text-sm uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity"
               style={{ color: 'var(--text)' }}
             >
               {label}
@@ -184,8 +194,8 @@ export default function Header() {
           ))}
 
           <div
-            className="flex items-center gap-6 mt-4"
-            style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}
+            className="flex items-center gap-7 pt-6"
+            style={{ borderTop: '1px solid var(--border)' }}
           >
             {langBtn}
             {themeBtn}

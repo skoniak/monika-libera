@@ -18,16 +18,15 @@ export default function Footer() {
   }, [])
 
   return (
-    <footer
-      className="w-full px-6 py-6 flex flex-wrap items-center justify-between gap-2 font-sans text-xs"
-      style={{ color: 'var(--text)', opacity: 0.5 }}
-    >
-      <span>© 2025 Monika Libera</span>
-      {version && (
-        <span>
-          build #{version.build} · {version.date}
-        </span>
-      )}
+    <footer style={{ borderTop: '1px solid var(--border)', color: 'var(--text)', opacity: 0.5 }}>
+      <div className="content-container flex flex-wrap items-center justify-between gap-2 py-5 font-sans text-xs">
+        <span>© 2025 Monika Libera</span>
+        {version && (
+          <span>
+            build #{version.build} · {version.date}
+          </span>
+        )}
+      </div>
     </footer>
   )
 }

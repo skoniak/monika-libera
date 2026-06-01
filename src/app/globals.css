@@ -11,6 +11,7 @@
   --text: #000000;
   --overlay: rgba(255, 255, 255, 0.75);
   --border: rgba(0, 0, 0, 0.12);
+  --content-max: 1280px;
 }
 
 html[data-theme="negative"] {
@@ -35,12 +36,24 @@ body {
   min-height: 100%;
   background-color: var(--bg);
   color: var(--text);
-  transition:
-    background-color 0.5s ease,
-    color 0.5s ease;
+  /* No transition here — the CRT animation covers instant bg swap */
   font-family: var(--font-sans), system-ui, sans-serif;
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── Shared layout container ──────────────────── */
+.content-container {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .content-container {
+    padding-inline: 3rem;
+  }
 }
 
 /* ── Typography ───────────────────────────────── */
@@ -55,6 +68,27 @@ h4 {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* ── B/W theme badge ──────────────────────────── */
+.theme-badge {
+  border: 1px solid currentColor;
+  color: var(--text);
+  background: transparent;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  line-height: 1;
+}
+
+.theme-badge:hover {
+  background: var(--text);
+  color: var(--bg);
 }
 
 /* ── Images — never affected by theme toggle ──── */

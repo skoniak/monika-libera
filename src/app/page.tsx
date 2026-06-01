@@ -6,12 +6,14 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 flex items-center justify-center">
-        <p
-          className="font-sans text-sm uppercase tracking-widest"
-          style={{ color: 'var(--text)', opacity: 0.4 }}
-        >
-          Kolekcje pojawią się tutaj
-        </p>
+        <div className="content-container flex items-center justify-center py-20">
+          <p
+            className="font-sans text-xs uppercase tracking-widest"
+            style={{ color: 'var(--text)', opacity: 0.3 }}
+          >
+            Kolekcje pojawią się tutaj
+          </p>
+        </div>
       </main>
       <Footer />
     </div>
