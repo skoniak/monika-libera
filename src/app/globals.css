@@ -98,3 +98,57 @@ img {
   display: block;
   max-width: 100%;
 }
+
+/* ── Collection grid hover effects ───────────── */
+
+/* Blur wrapper inside item */
+.collection-item__img-wrap {
+  position: absolute;
+  inset: 0;
+  transition: filter 0.45s ease;
+}
+
+.collection-item:hover .collection-item__img-wrap {
+  filter: blur(2px);
+}
+
+/* Overlay */
+.collection-item__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  background: var(--overlay);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.collection-item:hover .collection-item__overlay {
+  opacity: 1;
+}
+
+/* Staggered text slide-up */
+.collection-item__overlay-title,
+.collection-item__overlay-desc {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.4s ease-out,
+    transform 0.4s ease-out;
+}
+
+.collection-item:hover .collection-item__overlay-title {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0ms;
+}
+
+.collection-item:hover .collection-item__overlay-desc {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 150ms;
+}

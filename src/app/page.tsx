@@ -1,20 +1,21 @@
+import CollectionGrid from '@/components/CollectionGrid'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
+import { getCollections } from '@/sanity/queries'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const collections = await getCollections()
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 flex items-center justify-center">
-        <div className="content-container flex items-center justify-center py-20">
-          <p
-            className="font-sans text-xs uppercase tracking-widest"
-            style={{ color: 'var(--text)', opacity: 0.3 }}
-          >
-            Kolekcje pojawią się tutaj
-          </p>
+
+      <main className="flex-1 py-10 md:py-16">
+        <div className="content-container">
+          <CollectionGrid collections={collections} />
         </div>
       </main>
+
       <Footer />
     </div>
   )
