@@ -53,10 +53,10 @@ export default function Header() {
   const themeBtn = (
     <button
       onClick={toggleTheme}
-      className="theme-badge uppercase"
+      className="theme-toggle"
       aria-label={theme === 'positive' ? 'Przełącz na negatyw' : 'Przełącz na pozytyw'}
     >
-      B/W
+      {theme === 'positive' ? 'Negatyw' : 'Pozytyw'}
     </button>
   )
 
