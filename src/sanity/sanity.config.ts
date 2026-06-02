@@ -4,7 +4,7 @@ import { structureTool } from 'sanity/structure'
 import { apiVersion, dataset, projectId } from './env'
 import { schemaTypes } from './schemas'
 
-const singletonTypes = new Set(['siteSettings', 'contact'])
+const SINGLETON_TYPES = ['siteSettings', 'contact']
 
 export const config = defineConfig({
   projectId,
@@ -12,6 +12,14 @@ export const config = defineConfig({
   title: 'Monika Libera',
   basePath: '/studio',
   apiVersion,
+
+  // Hide singletons from the "New document" button — but keep templates intact
+  // so S.document().documentId() can create them when they don't exist yet.
+  document: {
+    newDocumentOptions: (prev) =>
+      prev.filter((template) => !SINGLETON_TYPES.includes(template.schemaType)),
+  },
+
   plugins: [
     structureTool({
       structure: (S) =>
@@ -27,7 +35,8 @@ export const config = defineConfig({
               .child(
                 S.document()
                   .schemaType('siteSettings')
-                  .documentId('siteSettings'),
+                  .documentId('siteSettings')
+                  .views([S.view.form()]),
               ),
             S.listItem()
               .title('Kontakt')
@@ -35,15 +44,17 @@ export const config = defineConfig({
               .child(
                 S.document()
                   .schemaType('contact')
-                  .documentId('contact'),
+                  .documentId('contact')
+                  .views([S.view.form()]),
               ),
           ]),
     }),
     visionTool({ defaultApiVersion: apiVersion }),
   ],
+
   schema: {
     types: schemaTypes,
-    templates: (templates) =>
-      templates.filter(({ schemaType }) => !singletonTypes.has(schemaType)),
+    // No template filter here — filtering was moved to document.newDocumentOptions.
+    // Keeping templates lets S.document().documentId() create the document on first open.
   },
 })
