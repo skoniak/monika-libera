@@ -4,6 +4,7 @@ export const contact = defineType({
   name: 'contact',
   title: 'Contact',
   type: 'document',
+  liveEdit: true,
   fields: [
     defineField({
       name: 'email',

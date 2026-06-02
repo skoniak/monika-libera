@@ -4,6 +4,7 @@ export const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
+  liveEdit: true,
   fields: [
     defineField({
       name: 'siteName',
