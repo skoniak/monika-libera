@@ -1,0 +1,13 @@
+[Unit]
+Description=Monika Libera portfolio
+After=network.target
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/monika-libera
+ExecStart=/usr/bin/npm run start:prod
+Restart=always
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/monika-libera/.env.production
+[Install]
+WantedBy=multi-user.target

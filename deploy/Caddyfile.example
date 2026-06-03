@@ -1,0 +1,3 @@
+monikalibera.com {
+    reverse_proxy localhost:3100
+}
