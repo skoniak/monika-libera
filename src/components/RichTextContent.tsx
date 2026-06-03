@@ -1,6 +1,7 @@
 'use client'
 
 import { PortableText } from '@portabletext/react'
+import type { PortableTextComponentProps, PortableTextMarkComponentProps } from '@portabletext/react'
 import type { PortableTextBlock } from '@portabletext/types'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -13,7 +14,7 @@ type Props = {
 
 const ptComponents = {
   block: {
-    normal: ({ children }: { children: React.ReactNode }) => (
+    normal: ({ children }: PortableTextComponentProps<PortableTextBlock>) => (
       <p
         className="font-sans font-light text-base leading-[1.9] mb-5"
         style={{ color: 'var(--text)' }}
@@ -21,7 +22,7 @@ const ptComponents = {
         {children}
       </p>
     ),
-    h2: ({ children }: { children: React.ReactNode }) => (
+    h2: ({ children }: PortableTextComponentProps<PortableTextBlock>) => (
       <h2
         className="font-serif text-2xl mt-10 mb-3 tracking-wide"
         style={{ color: 'var(--text)' }}
@@ -29,7 +30,7 @@ const ptComponents = {
         {children}
       </h2>
     ),
-    h3: ({ children }: { children: React.ReactNode }) => (
+    h3: ({ children }: PortableTextComponentProps<PortableTextBlock>) => (
       <h3
         className="font-serif text-xl mt-7 mb-2 tracking-wide"
         style={{ color: 'var(--text)' }}
@@ -37,7 +38,7 @@ const ptComponents = {
         {children}
       </h3>
     ),
-    blockquote: ({ children }: { children: React.ReactNode }) => (
+    blockquote: ({ children }: PortableTextComponentProps<PortableTextBlock>) => (
       <blockquote
         className="font-serif text-lg italic my-6 pl-4 opacity-65"
         style={{ borderLeft: '2px solid var(--text)', color: 'var(--text)' }}
@@ -47,17 +48,11 @@ const ptComponents = {
     ),
   },
   marks: {
-    strong: ({ children }: { children: React.ReactNode }) => (
+    strong: ({ children }: PortableTextMarkComponentProps) => (
       <strong className="font-semibold">{children}</strong>
     ),
-    em: ({ children }: { children: React.ReactNode }) => <em>{children}</em>,
-    link: ({
-      value,
-      children,
-    }: {
-      value?: { href: string }
-      children: React.ReactNode
-    }) => (
+    em: ({ children }: PortableTextMarkComponentProps) => <em>{children}</em>,
+    link: ({ value, children }: PortableTextMarkComponentProps<{ _type: string; href?: string }>) => (
       <a
         href={value?.href}
         target="_blank"
@@ -70,12 +65,12 @@ const ptComponents = {
     ),
   },
   list: {
-    bullet: ({ children }: { children: React.ReactNode }) => (
+    bullet: ({ children }: PortableTextComponentProps<PortableTextBlock>) => (
       <ul className="list-disc list-inside mb-5 space-y-1 font-sans font-light" style={{ color: 'var(--text)' }}>
         {children}
       </ul>
     ),
-    number: ({ children }: { children: React.ReactNode }) => (
+    number: ({ children }: PortableTextComponentProps<PortableTextBlock>) => (
       <ol className="list-decimal list-inside mb-5 space-y-1 font-sans font-light" style={{ color: 'var(--text)' }}>
         {children}
       </ol>

@@ -17,7 +17,7 @@ export const config = defineConfig({
   // so S.document().documentId() can create them when they don't exist yet.
   document: {
     newDocumentOptions: (prev) =>
-      prev.filter((template) => !SINGLETON_TYPES.includes(template.schemaType)),
+      prev.filter((template) => !SINGLETON_TYPES.includes(template.templateId)),
   },
 
   plugins: [
