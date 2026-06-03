@@ -3,19 +3,35 @@ import { client } from './client'
 
 // ── Types ────────────────────────────────────────
 
+export type SanityImage = {
+  _type: 'image'
+  asset: { _ref: string; _type: 'reference' }
+  hotspot?: { x: number; y: number; height: number; width: number }
+  crop?: { top: number; bottom: number; left: number; right: number }
+}
+
 export type Collection = {
   title_pl: string
   title_en: string | null
   description_pl: string | null
   description_en: string | null
-  coverImage: {
-    _type: 'image'
-    asset: { _ref: string; _type: 'reference' }
-    hotspot?: { x: number; y: number; height: number; width: number }
-    crop?: { top: number; bottom: number; left: number; right: number }
-  } | null
+  coverImage: SanityImage | null
   slug: string
   order: number | null
+}
+
+export type CollectionImage = {
+  _key: string
+  image: SanityImage | null
+  dimensions: { width: number; height: number } | null
+  title_pl: string | null
+  title_en: string | null
+  description_pl: string | null
+  description_en: string | null
+}
+
+export type CollectionDetail = Collection & {
+  images: CollectionImage[] | null
 }
 
 export type SiteSettings = {
@@ -64,6 +80,30 @@ const contactQuery = `*[_type == "contact"][0] {
   socialLinks
 }`
 
+const collectionDetailQuery = `*[_type == "collection" && slug.current == $slug][0] {
+  title_pl,
+  title_en,
+  description_pl,
+  description_en,
+  "slug": slug.current,
+  order,
+  coverImage,
+  "images": images[] {
+    _key,
+    image {
+      _type,
+      asset { _ref, _type },
+      hotspot,
+      crop
+    },
+    "dimensions": image.asset->metadata.dimensions,
+    title_pl,
+    title_en,
+    description_pl,
+    description_en
+  }
+}`
+
 // ── Fetch helpers ────────────────────────────────
 
 export async function getCollections(): Promise<Collection[]> {
@@ -80,4 +120,8 @@ export async function getPage(slug: string): Promise<Page | null> {
 
 export async function getContact(): Promise<Contact | null> {
   return client.fetch(contactQuery, {}, { next: { revalidate: 3600 } })
+}
+
+export async function getCollection(slug: string): Promise<CollectionDetail | null> {
+  return client.fetch(collectionDetailQuery, { slug }, { next: { revalidate: 300 } })
 }

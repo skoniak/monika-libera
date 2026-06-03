@@ -6,7 +6,9 @@ type Props = {
 }
 
 export default function CollectionGrid({ collections }: Props) {
-  if (collections.length === 0) {
+  const count = collections.length
+
+  if (count === 0) {
     return (
       <div className="flex items-center justify-center py-24">
         <p
@@ -18,6 +20,26 @@ export default function CollectionGrid({ collections }: Props) {
             /studio
           </a>
         </p>
+      </div>
+    )
+  }
+
+  if (count === 1) {
+    return (
+      <div className="flex justify-center">
+        <div className="w-full max-w-[500px]">
+          <CollectionItem collection={collections[0]} />
+        </div>
+      </div>
+    )
+  }
+
+  if (count <= 3) {
+    return (
+      <div className="collection-grid--few">
+        {collections.map((collection) => (
+          <CollectionItem key={collection.slug} collection={collection} />
+        ))}
       </div>
     )
   }

@@ -178,3 +178,64 @@ img {
   transform: translateY(0);
   transition-delay: 150ms;
 }
+
+/* ── Few-item centered grid (2–3 collections) ─── */
+.collection-grid--few {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem 1rem;
+}
+
+.collection-grid--few > * {
+  width: calc(50% - 0.5rem);
+  max-width: 380px;
+}
+
+@media (min-width: 768px) {
+  .collection-grid--few {
+    gap: 3rem 1.5rem;
+  }
+  .collection-grid--few > * {
+    width: calc(33.333% - 1rem);
+    max-width: 380px;
+  }
+}
+
+/* ── Lightbox ──────────────────────────────────── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.lightbox__img-wrap {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  font-size: 2rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s ease;
+  z-index: 1;
+}
+
+.lightbox__close:hover {
+  color: #ffffff;
+}
