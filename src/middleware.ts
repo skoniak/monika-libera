@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const password = process.env.SITE_PASSWORD
   if (!password) return NextResponse.next()
 
   const authHeader = request.headers.get('authorization')
   if (authHeader?.startsWith('Basic ')) {
     const encoded = authHeader.slice(6)
-    const decoded = Buffer.from(encoded, 'base64').toString('utf-8')
+    const decoded = atob(encoded)
     const colonIndex = decoded.indexOf(':')
     const pwd = colonIndex !== -1 ? decoded.slice(colonIndex + 1) : ''
     if (pwd === password) return NextResponse.next()
