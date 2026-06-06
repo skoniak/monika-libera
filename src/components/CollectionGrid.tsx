@@ -34,18 +34,8 @@ export default function CollectionGrid({ collections }: Props) {
     )
   }
 
-  if (count <= 3) {
-    return (
-      <div className="collection-grid--few">
-        {collections.map((collection) => (
-          <CollectionItem key={collection.slug} collection={collection} />
-        ))}
-      </div>
-    )
-  }
-
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12">
+    <div className="collection-grid">
       {collections.map((collection) => (
         <CollectionItem key={collection.slug} collection={collection} />
       ))}

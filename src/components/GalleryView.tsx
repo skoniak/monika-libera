@@ -7,9 +7,25 @@ import { useLanguage } from '@/context/LanguageContext'
 import { urlFor } from '@/sanity/image'
 import type { CollectionDetail, CollectionImage } from '@/sanity/queries'
 
+function ChevronLeft() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="18 22 10 14 18 6" />
+    </svg>
+  )
+}
+
+function ChevronRight() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="10 6 18 14 10 22" />
+    </svg>
+  )
+}
+
 export default function GalleryView({ collection }: { collection: CollectionDetail }) {
   const { lang } = useLanguage()
-  const [lightbox, setLightbox] = useState<CollectionImage | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const title = lang === 'en' && collection.title_en ? collection.title_en : collection.title_pl
   const description =
@@ -17,20 +33,34 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
       ? collection.description_en
       : collection.description_pl
 
+  // Filter out items without images so indices are reliable
+  const images: CollectionImage[] = (collection.images ?? []).filter(
+    (item): item is CollectionImage => item.image !== null
+  )
+
+  const isOpen = lightboxIndex !== null
+  const lightboxItem = isOpen ? images[lightboxIndex] : null
+
+  const closeLightbox = () => setLightboxIndex(null)
+  const goPrev = () => setLightboxIndex((i) => (i !== null && i > 0 ? i - 1 : i))
+  const goNext = () =>
+    setLightboxIndex((i) => (i !== null && i < images.length - 1 ? i + 1 : i))
+
   useEffect(() => {
-    if (!lightbox) return
+    if (!isOpen) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setLightbox(null)
+      if (e.key === 'Escape') closeLightbox()
+      if (e.key === 'ArrowLeft') goPrev()
+      if (e.key === 'ArrowRight') goNext()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [lightbox])
-
-  const images = collection.images ?? []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, lightboxIndex, images.length])
 
   return (
     <>
-      {/* Header */}
+      {/* Page header */}
       <div className="mb-10 md:mb-14">
         <h1
           className="font-serif text-3xl md:text-5xl tracking-wide mb-4"
@@ -48,7 +78,7 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
         )}
       </div>
 
-      {/* Images */}
+      {/* Image list */}
       <div className="space-y-10 md:space-y-16 max-w-3xl">
         {images.length === 0 && (
           <p className="font-sans text-xs opacity-35" style={{ color: 'var(--text)' }}>
@@ -56,13 +86,11 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
           </p>
         )}
 
-        {images.map((item) => {
-          if (!item.image) return null
-
+        {images.map((item, index) => {
           const imgTitle = lang === 'en' && item.title_en ? item.title_en : item.title_pl
           const imgDesc =
             lang === 'en' && item.description_en ? item.description_en : item.description_pl
-          const src = urlFor(item.image).width(1200).auto('format').url()
+          const src = urlFor(item.image!).width(1200).auto('format').url()
           const w = item.dimensions?.width ?? 1200
           const h = item.dimensions?.height ?? 900
 
@@ -71,7 +99,7 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
               <button
                 className="block w-full"
                 style={{ cursor: 'zoom-in' }}
-                onClick={() => setLightbox(item)}
+                onClick={() => setLightboxIndex(index)}
                 aria-label={imgTitle ?? 'Powiększ zdjęcie'}
               >
                 <Image
@@ -87,10 +115,7 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
               {(imgTitle || imgDesc) && (
                 <figcaption className="mt-3 space-y-1">
                   {imgTitle && (
-                    <p
-                      className="font-serif text-sm tracking-wide"
-                      style={{ color: 'var(--text)' }}
-                    >
+                    <p className="font-serif text-sm tracking-wide" style={{ color: 'var(--text)' }}>
                       {imgTitle}
                     </p>
                   )}
@@ -121,41 +146,79 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
       </div>
 
       {/* Lightbox */}
-      {lightbox?.image && (
-        <div
-          className="lightbox"
-          onClick={() => setLightbox(null)}
-          role="dialog"
-          aria-modal={true}
-        >
-          <button
-            className="lightbox__close"
-            onClick={() => setLightbox(null)}
-            aria-label="Zamknij"
+      {isOpen && lightboxItem?.image && (() => {
+        const lb = lightboxItem
+        const lbTitle = lang === 'en' && lb.title_en ? lb.title_en : lb.title_pl
+        const lbDesc = lang === 'en' && lb.description_en ? lb.description_en : lb.description_pl
+        return (
+          <div
+            className="lightbox"
+            onClick={closeLightbox}
+            role="dialog"
+            aria-modal={true}
+            aria-label="Podgląd zdjęcia"
           >
-            ×
-          </button>
-          <div className="lightbox__img-wrap" onClick={(e) => e.stopPropagation()}>
-            <Image
-              src={urlFor(lightbox.image).width(2400).auto('format').url()}
-              alt={
-                (lang === 'en' && lightbox.title_en ? lightbox.title_en : lightbox.title_pl) ?? ''
-              }
-              width={lightbox.dimensions?.width ?? 2400}
-              height={lightbox.dimensions?.height ?? 1600}
-              style={{
-                maxWidth: '90vw',
-                maxHeight: '90vh',
-                width: 'auto',
-                height: 'auto',
-                display: 'block',
-              }}
-              sizes="90vw"
-              priority
-            />
+            {/* Close */}
+            <button className="lightbox__close" onClick={closeLightbox} aria-label="Zamknij">
+              ×
+            </button>
+
+            {/* Prev arrow */}
+            {lightboxIndex! > 0 && (
+              <button
+                className="lightbox__arrow lightbox__arrow--prev"
+                onClick={(e) => { e.stopPropagation(); goPrev() }}
+                aria-label="Poprzednie zdjęcie"
+              >
+                <ChevronLeft />
+              </button>
+            )}
+
+            {/* Image + caption */}
+            <div className="lightbox__img-wrap" onClick={(e) => e.stopPropagation()}>
+              <Image
+                src={urlFor(lb.image!).width(2400).auto('format').url()}
+                alt={lbTitle ?? ''}
+                width={lb.dimensions?.width ?? 2400}
+                height={lb.dimensions?.height ?? 1600}
+                style={{
+                  maxWidth: '90vw',
+                  maxHeight: 'calc(90vh - 80px)',
+                  width: 'auto',
+                  height: 'auto',
+                  display: 'block',
+                }}
+                sizes="90vw"
+                priority
+              />
+
+              {(lbTitle || lbDesc) && (
+                <div className="lightbox__caption">
+                  {lbTitle && (
+                    <p className="font-serif text-sm tracking-wide text-white/80">{lbTitle}</p>
+                  )}
+                  {lbDesc && (
+                    <p className="font-sans font-light text-xs text-white/50 mt-1 leading-relaxed">
+                      {lbDesc}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Next arrow */}
+            {lightboxIndex! < images.length - 1 && (
+              <button
+                className="lightbox__arrow lightbox__arrow--next"
+                onClick={(e) => { e.stopPropagation(); goNext() }}
+                aria-label="Następne zdjęcie"
+              >
+                <ChevronRight />
+              </button>
+            )}
           </div>
-        </div>
-      )}
+        )
+      })()}
     </>
   )
 }

@@ -179,26 +179,34 @@ img {
   transition-delay: 150ms;
 }
 
-/* ── Few-item centered grid (2–3 collections) ─── */
-.collection-grid--few {
+/* ── Collection grid — flex, always centered ───── */
+/*
+ * Items are sized to exactly fill 2 cols (mobile) or 3 cols (desktop).
+ * justify-content: center means any orphaned last-row items are
+ * automatically centred — works for 2, 3, 4, 5 … N collections.
+ *
+ * Math (mobile, gap-x 1rem):
+ *   2 items × calc(50% − 0.5rem) + 1 gap × 1rem = 100%  ✓
+ * Math (desktop, gap-x 1.5rem):
+ *   3 items × calc(33.333% − 1rem) + 2 gaps × 1.5rem = 100%  ✓
+ */
+.collection-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 2rem 1rem;
 }
 
-.collection-grid--few > * {
+.collection-grid > * {
   width: calc(50% - 0.5rem);
-  max-width: 380px;
 }
 
 @media (min-width: 768px) {
-  .collection-grid--few {
+  .collection-grid {
     gap: 3rem 1.5rem;
   }
-  .collection-grid--few > * {
+  .collection-grid > * {
     width: calc(33.333% - 1rem);
-    max-width: 380px;
   }
 }
 
@@ -217,8 +225,10 @@ img {
 .lightbox__img-wrap {
   cursor: default;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 1rem;
+  max-width: 90vw;
 }
 
 .lightbox__close {
@@ -238,4 +248,31 @@ img {
 
 .lightbox__close:hover {
   color: #ffffff;
+}
+
+.lightbox__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  opacity: 0.4;
+  cursor: pointer;
+  padding: 1.25rem 1rem;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+  line-height: 0;
+}
+
+.lightbox__arrow:hover {
+  opacity: 0.85;
+}
+
+.lightbox__arrow--prev { left: 0; }
+.lightbox__arrow--next { right: 0; }
+
+.lightbox__caption {
+  text-align: center;
+  max-width: 60ch;
 }
