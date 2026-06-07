@@ -117,7 +117,7 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
                   alt={imgTitle ?? ''}
                   width={w}
                   height={h}
-                  loading="lazy"
+                  loading={index < 2 ? 'eager' : 'lazy'}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                 />
               </button>
