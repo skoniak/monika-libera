@@ -210,6 +210,19 @@ img {
   }
 }
 
+/* ── Footer credit link ───────────────────────── */
+.footer-credit {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.65rem;
+  opacity: 0.3;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footer-credit:hover {
+  opacity: 0.6;
+}
+
 /* ── Lightbox ──────────────────────────────────── */
 .lightbox {
   position: fixed;
