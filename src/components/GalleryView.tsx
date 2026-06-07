@@ -47,6 +47,17 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
     setLightboxIndex((i) => (i !== null && i < images.length - 1 ? i + 1 : i))
 
   useEffect(() => {
+    if (lightboxIndex === null) return
+    const toPreload = [lightboxIndex - 1, lightboxIndex + 1].filter(
+      (i) => i >= 0 && i < images.length
+    )
+    toPreload.forEach((i) => {
+      const img = new window.Image()
+      img.src = urlFor(images[i].image!).width(2400).auto('format').url()
+    })
+  }, [lightboxIndex, images])
+
+  useEffect(() => {
     if (!isOpen) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeLightbox()

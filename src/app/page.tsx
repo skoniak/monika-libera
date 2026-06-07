@@ -10,7 +10,7 @@ export default async function HomePage() {
     <div className="flex flex-col min-h-screen">
       <Header />
 
-      <main className="flex-1 py-10 md:py-16">
+      <main className="flex-1 flex items-center py-10 md:py-16">
         <div className="content-container">
           <CollectionGrid collections={collections} />
         </div>
