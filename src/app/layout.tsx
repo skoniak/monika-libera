@@ -27,6 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" className={`${cormorant.variable} ${inter.variable}`}>
+      <head>
+        <meta name="theme-color" content="#ffffff" />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>
