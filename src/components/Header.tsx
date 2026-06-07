@@ -8,12 +8,10 @@ import { useTheme } from '@/context/ThemeContext'
 const NAV = {
   pl: [
     { href: '/bio', label: 'Bio' },
-    { href: '/achievements', label: 'Osiągnięcia' },
     { href: '/contact', label: 'Kontakt' },
   ],
   en: [
     { href: '/bio', label: 'Bio' },
-    { href: '/achievements', label: 'Achievements' },
     { href: '/contact', label: 'Contact' },
   ],
 }
