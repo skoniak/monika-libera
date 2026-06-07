@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { urlFor } from '@/sanity/image'
@@ -18,7 +17,7 @@ export default function CollectionItem({ collection }: { collection: Collection 
       : collection.description_pl
 
   const imageUrl = collection.coverImage
-    ? urlFor(collection.coverImage).width(800).height(800).fit('crop').auto('format').url()
+    ? urlFor(collection.coverImage).width(800).quality(75).auto('format').url()
     : null
 
   return (
@@ -28,12 +27,10 @@ export default function CollectionItem({ collection }: { collection: Collection 
         <div className="relative overflow-hidden aspect-square">
           <div className="collection-item__img-wrap">
             {imageUrl ? (
-              <Image
+              <img
                 src={imageUrl}
                 alt={title}
-                fill
-                sizes="(max-width: 768px) 50vw, 33vw"
-                style={{ objectFit: 'cover' }}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
               <div className="w-full h-full" style={{ background: 'var(--border)' }} />

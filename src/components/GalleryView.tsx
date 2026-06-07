@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -53,7 +52,7 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
     )
     toPreload.forEach((i) => {
       const img = new window.Image()
-      img.src = urlFor(images[i].image!).width(2400).auto('format').url()
+      img.src = urlFor(images[i].image!).width(1920).quality(85).auto('format').url()
     })
   }, [lightboxIndex, images])
 
@@ -101,7 +100,7 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
           const imgTitle = lang === 'en' && item.title_en ? item.title_en : item.title_pl
           const imgDesc =
             lang === 'en' && item.description_en ? item.description_en : item.description_pl
-          const src = urlFor(item.image!).width(1200).auto('format').url()
+          const src = urlFor(item.image!).width(1200).quality(80).auto('format').url()
           const w = item.dimensions?.width ?? 1200
           const h = item.dimensions?.height ?? 900
 
@@ -113,13 +112,13 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
                 onClick={() => setLightboxIndex(index)}
                 aria-label={imgTitle ?? 'Powiększ zdjęcie'}
               >
-                <Image
+                <img
                   src={src}
                   alt={imgTitle ?? ''}
                   width={w}
                   height={h}
+                  loading="lazy"
                   style={{ width: '100%', height: 'auto', display: 'block' }}
-                  sizes="(max-width: 768px) 100vw, 800px"
                 />
               </button>
 
@@ -187,11 +186,11 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
 
             {/* Image + caption */}
             <div className="lightbox__img-wrap" onClick={(e) => e.stopPropagation()}>
-              <Image
-                src={urlFor(lb.image!).width(2400).auto('format').url()}
+              <img
+                src={urlFor(lb.image!).width(1920).quality(85).auto('format').url()}
                 alt={lbTitle ?? ''}
-                width={lb.dimensions?.width ?? 2400}
-                height={lb.dimensions?.height ?? 1600}
+                width={lb.dimensions?.width ?? 1920}
+                height={lb.dimensions?.height ?? 1280}
                 style={{
                   maxWidth: '90vw',
                   maxHeight: 'calc(90vh - 80px)',
@@ -199,8 +198,6 @@ export default function GalleryView({ collection }: { collection: CollectionDeta
                   height: 'auto',
                   display: 'block',
                 }}
-                sizes="90vw"
-                priority
               />
 
               {(lbTitle || lbDesc) && (
