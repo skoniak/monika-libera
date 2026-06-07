@@ -19,7 +19,7 @@ export default function Footer() {
 
   return (
     <footer style={{ borderTop: '1px solid var(--border)', color: 'var(--text)' }}>
-      <div className="content-container flex items-center justify-between gap-2 py-5">
+      <div className="content-container flex items-baseline justify-between gap-2 py-5">
         <span className="font-sans text-xs" style={{ opacity: 0.5 }}>
           © 2025 Monika Libera
           {version && ` · build #${version.build} · ${version.date}`}
@@ -32,7 +32,7 @@ export default function Footer() {
           className="footer-credit"
           style={{ color: 'var(--text)' }}
         >
-          <span style={{ filter: 'grayscale(1)' }}>🎨</span> skoniak.com
+          <span style={{ filter: 'grayscale(1)' }}>🎨</span>skoniak.com
         </a>
       </div>
     </footer>

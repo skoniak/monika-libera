@@ -213,14 +213,15 @@ img {
 /* ── Footer credit link ───────────────────────── */
 .footer-credit {
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.65rem;
-  opacity: 0.3;
+  font-size: 0.5rem;
+  opacity: 0.15;
   text-decoration: none;
   transition: opacity 0.2s ease;
+  line-height: 1;
 }
 
 .footer-credit:hover {
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 /* ── Lightbox ──────────────────────────────────── */
